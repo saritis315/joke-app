@@ -4,15 +4,15 @@
   <ellipse cx="60" cy="96" rx="54" ry="14" fill="#2B1E4A"/>
   <ellipse cx="60" cy="90" rx="47" ry="12" fill="#6B5B9A" stroke="#2B1E4A" stroke-width="3"/>
   <!-- the red button -->
-  <path d="M20 88V52a40 32 0 0 1 80 0v36a40 11 0 0 1-80 0z" fill="#F23D2F" stroke="#2B1E4A" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M23 80a37 10 0 0 0 74 0v8a40 11 0 0 1-77 0z" fill="#C92A20"/>
+  <path d="M20 88V52a40 32 0 0 1 80 0v36a40 11 0 0 1-80 0z" fill="#F25C00" stroke="#2B1E4A" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M23 80a37 10 0 0 0 74 0v8a40 11 0 0 1-77 0z" fill="#C24A00"/>
   <ellipse cx="42" cy="34" rx="11" ry="5" transform="rotate(-22 42 34)" fill="#FFFFFF" opacity=".85"/>
   <!-- cheeks -->
-  <ellipse cx="34" cy="70" rx="6" ry="3.5" fill="#FF8FB8"/>
-  <ellipse cx="86" cy="70" rx="6" ry="3.5" fill="#FF8FB8"/>
+  <ellipse cx="34" cy="70" rx="6" ry="3.5" fill="#FFB36B"/>
+  <ellipse cx="86" cy="70" rx="6" ry="3.5" fill="#FFB36B"/>
   <!-- face: X eyes, wavy mouth, stars over the head -->
   <path d="M40 51l12 12M52 51l-12 12M68 51l12 12M80 51l-12 12" stroke="#2B1E4A" stroke-width="4" stroke-linecap="round"/>
   <path d="M46 76q5-6 10 0t10 0t10 0" fill="none" stroke="#2B1E4A" stroke-width="4" stroke-linecap="round"/>
-  <path d="M60 4l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#FFE15A" stroke="#2B1E4A" stroke-width="2"/>
-  <path d="M88 12l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z" fill="#FFE15A" stroke="#2B1E4A" stroke-width="2"/>
+  <path d="M60 4l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#FFD60A" stroke="#2B1E4A" stroke-width="2"/>
+  <path d="M88 12l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z" fill="#FFD60A" stroke="#2B1E4A" stroke-width="2"/>
 </svg>

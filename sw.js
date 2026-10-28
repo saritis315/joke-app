@@ -1,4 +1,4 @@
-const CACHE = "joke-app-v1";
+const CACHE = "joke-app-v2";
 const PRECACHE = [
   "/",
   "/manifest.webmanifest",
