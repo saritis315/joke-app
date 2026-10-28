@@ -175,10 +175,11 @@
           body: JSON.stringify({ topic }),
         });
         const data = await response.json();
-        if (!response.ok || !data.joke) throw new Error(data.error || "שגיאה");
+        if (!response.ok || !data.joke) throw new Error(data.error || "משהו השתבש. אפשר לנסות שוב.");
         setState("joke", data.joke, "עוד בדיחה!");
       } catch (err) {
-        setState("error", "משהו השתבש. אפשר לנסות שוב.", "לנסות שוב");
+        const known = err instanceof Error && /[֐-׿]/.test(err.message);
+        setState("error", known ? err.message : "משהו השתבש. אפשר לנסות שוב.", "לנסות שוב");
       }
     });
   </script>
