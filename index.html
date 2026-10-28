@@ -68,7 +68,7 @@
     }
     input::placeholder { color: var(--hint); }
     input:focus { outline: 4px solid var(--blue); }
-    button {
+    #go {
       min-height: 64px;
       width: 100%;
       font: 700 24px "Fredoka", system-ui, sans-serif;
@@ -81,11 +81,56 @@
       cursor: pointer;
       margin-bottom: 8px;
     }
-    button:active, button:disabled {
+    #go:active, #go:disabled {
       transform: translateY(6px) rotate(-1deg);
       box-shadow: 0 2px 0 var(--ink);
     }
-    button:disabled { cursor: default; }
+    #go:disabled { cursor: default; }
+    .star {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      font: 700 28px/1 "Fredoka", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+    }
+    .star[aria-pressed="true"] { background: var(--sun); }
+    .star:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .saved { display: flex; flex-direction: column; gap: 10px; }
+    .saved[hidden] { display: none; }
+    .saved h2 { margin: 0; font-size: 20px; font-weight: 700; }
+    .saved ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .saved li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 4px 4px 0 var(--ink);
+      padding: 12px 14px;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+    .saved li span { flex: 1; }
+    .saved li button {
+      flex: none;
+      min-width: 44px;
+      min-height: 44px;
+      font: 600 16px "Fredoka", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--sun);
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      cursor: pointer;
+    }
     button:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
     .bubble {
       position: relative;
@@ -148,6 +193,12 @@
     <section class="bubble" id="bubble" data-state="idle" aria-live="polite">
       <img class="mascot" id="mascot" src="assets/mascot-idle.svg" alt="">
       <p id="text">לוחצים על הכפתור, והבדיחה מופיעה כאן</p>
+      <button class="star" id="star" type="button" aria-pressed="false" aria-label="שמירת הבדיחה" hidden>☆</button>
+    </section>
+
+    <section class="saved" id="saved" hidden>
+      <h2>הבדיחות שלי</h2>
+      <ul id="savedList"></ul>
     </section>
 
     <footer>מיישם AI ואוטומציה · 53500</footer>
@@ -171,7 +222,70 @@
       text.textContent = message;
       go.textContent = label;
       go.disabled = state === "think";
+      currentJoke = state === "joke" ? message : "";
+      star.hidden = state !== "joke";
+      renderSaved();
     }
+
+    const star = document.getElementById("star");
+    const saved = document.getElementById("saved");
+    const savedList = document.getElementById("savedList");
+    const STORAGE_KEY = "savedJokes";
+    const MAX_SAVED = 50;
+    let currentJoke = "";
+
+    function loadSaved() {
+      try {
+        const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(list) ? list.filter((j) => typeof j === "string") : [];
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function storeSaved(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (err) {
+        console.error("save failed", err);
+      }
+    }
+
+    function renderSaved() {
+      const list = loadSaved();
+      saved.hidden = list.length === 0;
+      savedList.replaceChildren(...list.map((joke) => {
+        const item = document.createElement("li");
+        const span = document.createElement("span");
+        span.textContent = joke;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "מחיקה";
+        remove.setAttribute("aria-label", "מחיקת הבדיחה מהרשימה");
+        remove.addEventListener("click", () => {
+          storeSaved(loadSaved().filter((j) => j !== joke));
+          renderSaved();
+        });
+        item.append(span, remove);
+        return item;
+      }));
+      const isSaved = currentJoke !== "" && list.includes(currentJoke);
+      star.textContent = isSaved ? "★" : "☆";
+      star.setAttribute("aria-pressed", String(isSaved));
+      star.setAttribute("aria-label", isSaved ? "ביטול שמירת הבדיחה" : "שמירת הבדיחה");
+    }
+
+    star.addEventListener("click", () => {
+      if (!currentJoke) return;
+      const list = loadSaved();
+      const next = list.includes(currentJoke)
+        ? list.filter((j) => j !== currentJoke)
+        : [currentJoke, ...list].slice(0, MAX_SAVED);
+      storeSaved(next);
+      renderSaved();
+    });
+
+    renderSaved();
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
