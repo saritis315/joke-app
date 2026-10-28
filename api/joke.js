@@ -39,9 +39,11 @@ export default {
     }
 
     let topic = "";
+    let previous = "";
     try {
       const body = await request.json();
       if (typeof body?.topic === "string") topic = body.topic.trim().slice(0, 100);
+      if (typeof body?.improve === "string") previous = body.improve.trim().slice(0, 600);
     } catch {
       topic = "";
     }
@@ -53,7 +55,11 @@ export default {
     }
 
     const model = process.env.OPENAI_MODEL || "gpt-5";
-    console.log(`joke request: topic="${topic}" model=${model}`);
+    console.log(`joke request: topic="${topic}" improve=${previous !== ""} model=${model}`);
+    const subject = topic ? `נושא הבדיחה: ${topic}` : "אין נושא. ספר בדיחה כללית על החיים.";
+    const input = previous
+      ? `${subject}\nהבדיחה הנוכחית:\n${previous}\nשפר אותה: הפוך אותה למצחיקה יותר, עם פאנץ' חד יותר. החזר רק את הבדיחה המשופרת.`
+      : subject;
 
     try {
       const response = await fetch("https://api.openai.com/v1/responses", {
@@ -65,7 +71,7 @@ export default {
         body: JSON.stringify({
           model,
           instructions: INSTRUCTIONS,
-          input: topic ? `נושא הבדיחה: ${topic}` : "אין נושא. ספר בדיחה כללית על החיים.",
+          input,
           reasoning: { effort: "low" },
           max_output_tokens: 2000,
         }),

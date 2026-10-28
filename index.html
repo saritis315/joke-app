@@ -103,6 +103,20 @@
     }
     .star[aria-pressed="true"] { background: var(--sun); }
     .star:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .improve {
+      min-height: 44px;
+      padding: 6px 18px;
+      font: 600 18px "Fredoka", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--sun);
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+    }
+    .improve:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .improve:disabled { cursor: default; opacity: .6; }
+    .improve[hidden] { display: none; }
     .saved { display: flex; flex-direction: column; gap: 10px; }
     .saved[hidden] { display: none; }
     .saved h2 { margin: 0; font-size: 20px; font-weight: 700; }
@@ -193,6 +207,7 @@
     <section class="bubble" id="bubble" data-state="idle" aria-live="polite">
       <img class="mascot" id="mascot" src="assets/mascot-idle.svg" alt="">
       <p id="text">לוחצים על הכפתור, והבדיחה מופיעה כאן</p>
+      <button class="improve" id="improve" type="button" hidden>שפרו את הבדיחה</button>
       <button class="star" id="star" type="button" aria-pressed="false" aria-label="שמירת הבדיחה" hidden>☆</button>
     </section>
 
@@ -224,10 +239,12 @@
       go.disabled = state === "think";
       currentJoke = state === "joke" ? message : "";
       star.hidden = state !== "joke";
+      improveBtn.hidden = state !== "joke";
       renderSaved();
     }
 
     const star = document.getElementById("star");
+    const improveBtn = document.getElementById("improve");
     const saved = document.getElementById("saved");
     const savedList = document.getElementById("savedList");
     const STORAGE_KEY = "savedJokes";
@@ -287,15 +304,26 @@
 
     renderSaved();
 
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
+      requestJoke("");
+    });
+
+    improveBtn.addEventListener("click", () => {
+      if (currentJoke) requestJoke(currentJoke);
+    });
+
+    async function requestJoke(improve) {
       const topic = topicInput.value.trim();
-      setState("think", topic ? "מחפש בדיחה על " + topic + "..." : "מחפש בדיחה...", "חושב...");
+      const message = improve
+        ? "משפר את הבדיחה..."
+        : topic ? "מחפש בדיחה על " + topic + "..." : "מחפש בדיחה...";
+      setState("think", message, "חושב...");
       try {
         const response = await fetch("/api/joke", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic }),
+          body: JSON.stringify(improve ? { topic, improve } : { topic }),
         });
         const data = await response.json();
         if (!response.ok || !data.joke) throw new Error(data.error || "משהו השתבש. אפשר לנסות שוב.");
@@ -304,7 +332,7 @@
         const known = err instanceof Error && /[֐-׿]/.test(err.message);
         setState("error", known ? err.message : "משהו השתבש. אפשר לנסות שוב.", "לנסות שוב");
       }
-    });
+    }
   </script>
 </body>
 </html>
